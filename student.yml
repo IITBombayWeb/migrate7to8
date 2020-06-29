@@ -1,0 +1,91 @@
+id: student_migration
+class: null
+field_plugin_method: null
+cck_plugin_method: null
+migration_tags:
+  - CSV
+migration_group: default
+label: 'Student content migration'
+source:
+  plugin: csv
+  path: /var/www/migrationdata/csv/student-sample.csv
+  delimiter: ','
+  enclosure: '"'
+  header_row_count: 1
+  keys:
+    - id
+  constants:
+    file_source: /var/www/migrationdata/student_images
+    file_dest: 'public://student_images/'
+process:
+  type:
+    plugin: default_value
+    default_value: student_page
+  source_path:
+    -
+      plugin: skip_on_empty
+      method: process
+      source: photo
+    -
+      plugin: concat
+      delimiter: /
+      source:
+        - constants/file_source
+        - photo
+  title: title
+  body/value: body
+  body/format:
+    plugin: default_value
+    default_value: basic_html
+  field_student_admission_status: student_admission_status
+  field_awards_and_fellowship:
+    -
+      plugin: explode
+      delimiter: ' | '
+      source: awards_and_fellowships
+  field_student_background:
+    -
+      plugin: explode
+      delimiter: ' | '
+      source: background
+  field_student_building: student_building
+  field_student_degree_programme: student_degree_programme
+  field_student_email: email
+  field_student_current_employment: current_employment
+  field_student_employment_history: employment_history
+  field_student_full_name/given: first_name
+  field_student_full_name/middle: middle_name
+  field_student_full_name/family: last_name
+  field_student_hostel_and_room_nu: room_no
+  field_student_lab_room_number/value: lab_room_no
+  field_student_lab_room_number/format:
+    plugin: default_value
+    default_value: basic_html
+  field_mobile_number/value: mobile_no
+  field_mobile_number/format:
+    plugin: default_value
+    default_value: basic_html
+  field_phone_no/value: phone_no
+  field_phone_no/format:
+    plugin: default_value
+    default_value: basic_html
+  field_student_photo:
+    plugin: file_import
+    source: '@source_path'
+    destination: constants/file_dest
+  field_student_public_profile_url/uri: profile_url
+  field_student_public_profile_url/title:
+    plugin: default_value
+    default_value: 'Detailed Information/Research Group Web-Page'
+  field_r_d_projects/value: r&d_projects
+  field_r_d_projects/format:
+    plugin: default_value
+    default_value: basic_html
+  field_student_roll_number: roll_no
+  field_student_year_of_admission: year_of_student
+destination:
+  plugin: 'entity:node'
+  bundle: student_page
+migration_dependencies:
+  required: {  }
+  optional: {  }
